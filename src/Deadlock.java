@@ -15,7 +15,7 @@ import java.util.Scanner;
  *
  * @author April Dae Bation
  */
-public class Deadlock_Avoidance {
+public class Deadlock {
    
     static Matrix allocation;
     static Matrix maximum;
@@ -26,54 +26,23 @@ public class Deadlock_Avoidance {
     static int processes;
     static int resources;
         
-    public void execute() {
-        System.out.print("Enter number of processes: ");
-        processes = sc.nextInt();
-        System.out.print("Enter number of resources: ");
-        resources = sc.nextInt();
-        System.out.println("----------\n");
+    public static void main(String[] args) {
+        System.out.print("\nA.Deadlock Prevention\nB.Deadlock Avoidance\nChoose: ");
+        String ch = sc.nextLine();
         
-        initMatrices(processes, resources);
-        showMatrix(allocation, "Allocation Matrix");
-        showMatrix(maximum, "Maximum Needed Resources Matrix");
-        showMatrix(available, "Available Resources");
-        showMatrix(needed, "Needed Resources");
-        calculateSafeSequence();
-        System.out.println("");
+        if(ch.equals("A")){
+            deadlockPrevention();
+        }
+        else if(ch.equals("B")){
+            System.out.print("Enter number of processes: ");
+            processes = sc.nextInt();
+            System.out.print("Enter number of resources: ");
+            resources = sc.nextInt();
+            System.out.println("----------\n");
+            initMatrices(processes, resources);
+            deadlockAvoidance();
+        }
        
-        do{
-            System.out.print("\nPress 1 for new request details: ");
-            int choice = sc.nextInt();
-            if(choice!=1)
-                break;
-            else{
-                System.out.print("Enter Process Id: ");
-                int pid = sc.nextInt() - 1;
-                Matrix res = new Matrix(1, resources);
-                for(int i=0; i<resources; i++){
-                    System.out.print("Request for Resource " + (i+1) + ": ");
-                    int tmp = sc.nextInt();
-                    res.set(0, i, tmp);
-                }
-                if(processRequest(pid, res)){
-                    showMatrix(allocation, "Allocation Matrix");
-                    showMatrix(maximum, "Maximum Needed Resources Matrix");
-                    showMatrix(available, "Available Resources");
-                    showMatrix(needed, "Needed Resources");
-
-                    if (calculateSafeSequence())
-                        System.out.println("\nP" + (pid+1) + " is successfully granted! \n");
-                    else 
-                        System.out.println("P" + (pid+1) + " request denied.");
-                }
-                else{
-                    System.out.println("P" + (pid+1) + " request denied.");
-                }
-            }
-            
-        } while(true);
-        
-        
     }
     
     static Matrix originalAvailable;
@@ -220,5 +189,62 @@ public class Deadlock_Avoidance {
         return true;
     }
 
+    private static void deadlockPrevention() {
+//        showMatrix(allocation, "Allocation Matrix");
+//        showMatrix(maximum, "Maximum Needed Resources Matrix");
+//        showMatrix(available, "Available Resources");
+//        showMatrix(needed, "Needed Resources");
+//        if(isDeadlock()){
+//            System.out.println("Deadlock.");
+//        }
+//        else{
+//            calculateSafeSequence();
+//            System.out.println("");
+//        }
+    }
+
+    
+    private static void deadlockAvoidance() {
+        showMatrix(allocation, "Allocation Matrix");
+        showMatrix(maximum, "Maximum Needed Resources Matrix");
+        showMatrix(available, "Available Resources");
+        showMatrix(needed, "Needed Resources");
+        calculateSafeSequence();
+        System.out.println("");
+       
+        do{
+            System.out.print("\nPress 1 for new request details: ");
+            int choice = sc.nextInt();
+            if(choice!=1)
+                break;
+            else{
+                System.out.print("Enter Process Id: ");
+                int pid = sc.nextInt() - 1;
+                Matrix res = new Matrix(1, resources);
+                for(int i=0; i<resources; i++){
+                    System.out.print("Request for Resource " + (i+1) + ": ");
+                    int tmp = sc.nextInt();
+                    res.set(0, i, tmp);
+                }
+                if(processRequest(pid, res)){
+                    showMatrix(allocation, "Allocation Matrix");
+                    showMatrix(maximum, "Maximum Needed Resources Matrix");
+                    showMatrix(available, "Available Resources");
+                    showMatrix(needed, "Needed Resources");
+
+                    if (calculateSafeSequence())
+                        System.out.println("\nP" + (pid+1) + " is successfully granted! \n");
+                    else 
+                        System.out.println("P" + (pid+1) + " request denied.");
+                }
+                else{
+                    System.out.println("P" + (pid+1) + " request denied.");
+                }
+            }
+            
+        } while(true);
+    }
+
+   
    
 }
