@@ -34,10 +34,15 @@ public class Deadlocks {
         System.out.println("----------\n");
         
         initMatrices(processes, resources);
-        
+        showMatrix(allocation, "Allocation Matrix");
+        showMatrix(maximum, "Maximum Needed Resources Matrix");
+        showMatrix(available, "Available Resources");
+        showMatrix(needed, "Needed Resources");
+        calculateSafeSequence();
+        System.out.println("");
        
         do{
-            System.out.print("Press 1 for new request details: ");
+            System.out.print("\nPress 1 for new request details: ");
             int choice = sc.nextInt();
             if(choice!=1)
                 break;
@@ -71,6 +76,7 @@ public class Deadlocks {
         
     }
     
+    static Matrix originalAvailable;
     private static void initMatrices(int processes, int resources) {
         allocation = new Matrix(processes, resources, 0);
         maximum = new Matrix(processes, resources, 0);
@@ -99,6 +105,7 @@ public class Deadlocks {
             int tmp = sc.nextInt();
             available.set(0, i, tmp);
         }
+        originalAvailable = new Matrix(available.getArrayCopy());
         System.out.println("");
         needed = maximum.minus(allocation);
        
@@ -121,6 +128,9 @@ public class Deadlocks {
             p.add(i);
         }
         
+        //check deadlock state here. if kapila na balik sa queue pero wala na add
+        //sa safe state, deadlock na
+        
         while(!p.isEmpty()){
             int pid = (int) p.remove();
             boolean allow = checkSufficientResource(pid);
@@ -131,16 +141,36 @@ public class Deadlocks {
                 updateAvailableResources(pid);
                 safeSequence.add(pid);
             }
+            if(isDeadlock()){
+                System.out.println("State: Deadlock");
+                safe=false;
+                break;
+            }
         }
+        
         if(safe==true){
             System.out.println("State: Safe");
             System.out.println("Safe Sequence: ");
             for(int i=0; i<safeSequence.size(); i++){
                 System.out.print("P" + (safeSequence.get(i)+1) + " ");
             }
+            available = new Matrix(originalAvailable.getArray());
             return true;
         }
         return false;
+    }
+    
+    private static boolean isDeadlock() {
+        boolean flag = false;
+        for(int i=0; i<processes; i++){
+            if(checkSufficientResource(i)){
+                flag = true;
+            }
+        }
+        if(flag==true)
+            return false;
+        
+        return true;
     }
 
     private static boolean checkSufficientResource(int pid) {
@@ -150,7 +180,6 @@ public class Deadlocks {
             if(tmp_needed > res)
                 return false;
         }
-            
         return true;
     }
 
@@ -164,18 +193,32 @@ public class Deadlocks {
     }
 
     private static boolean processRequest(int pid, Matrix res) {
-        available.minusEquals(res);
+        available = new Matrix(originalAvailable.getArrayCopy());
+        
         for(int i=0; i<available.getColumnDimension(); i++){
-            if(available.get(0, i) < 0){
-                available.plusEquals(res);
+            if(available.get(0, i) < res.get(0, i)){
+                System.out.println("Insufficient resource");
                 return false;
             }
         }
+        
+        available.minusEquals(res);
+        originalAvailable = new Matrix(available.getArrayCopy());
+        
+        
         for(int i=0; i<resources; i++){
             double tmp = allocation.get(pid, i);
             double r = res.get(0, i);
             allocation.set(pid, i, tmp+r);
         }
+        for(int i=0; i<resources; i++){
+            double tmp = needed.get(pid, i);
+            double r = res.get(0, i);
+            needed.set(pid, i, tmp-r);
+        }
+       
         return true;
     }
+
+   
 }
