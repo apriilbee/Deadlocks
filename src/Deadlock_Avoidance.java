@@ -15,7 +15,7 @@ import java.util.Scanner;
  *
  * @author April Dae Bation
  */
-public class Deadlocks {
+public class Deadlock_Avoidance {
    
     static Matrix allocation;
     static Matrix maximum;
@@ -26,7 +26,7 @@ public class Deadlocks {
     static int processes;
     static int resources;
         
-    public static void main(String[] args) {
+    public void execute() {
         System.out.print("Enter number of processes: ");
         processes = sc.nextInt();
         System.out.print("Enter number of resources: ");
