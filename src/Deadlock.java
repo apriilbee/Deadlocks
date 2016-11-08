@@ -29,7 +29,7 @@ public class Deadlock {
     public static void main(String[] args) {
         System.out.print("\nA.Deadlock Prevention\nB.Deadlock Avoidance\nChoose: ");
         String ch = sc.nextLine();
-        
+            
         if(ch.equals("A")){
             deadlockPrevention();
         }
@@ -188,21 +188,6 @@ public class Deadlock {
        
         return true;
     }
-
-    private static void deadlockPrevention() {
-//        showMatrix(allocation, "Allocation Matrix");
-//        showMatrix(maximum, "Maximum Needed Resources Matrix");
-//        showMatrix(available, "Available Resources");
-//        showMatrix(needed, "Needed Resources");
-//        if(isDeadlock()){
-//            System.out.println("Deadlock.");
-//        }
-//        else{
-//            calculateSafeSequence();
-//            System.out.println("");
-//        }
-    }
-
     
     private static void deadlockAvoidance() {
         showMatrix(allocation, "Allocation Matrix");
@@ -244,7 +229,90 @@ public class Deadlock {
             
         } while(true);
     }
+    
+    private static void deadlockPrevention() {
+        ArrayList<Process> processes = new ArrayList();
+        System.out.print("Enter number of processes: ");
+        int num = sc.nextInt();
+        for(int i=0; i<num; i++){
+            System.out.print("Name of process " + (i+1) + ": " );
+            String name = sc.next();
+            System.out.print("Time for process " + name + ": ");
+            int time = sc.nextInt();
+            Process tmp = new Process(i, name, time);
+            processes.add(tmp);
+            System.out.println("");
+        }
+        System.out.println("Enter value of available resources: ");
+        int avail = sc.nextInt();
+        calculatePrev(processes, avail);
+    }
+    
+    private static void calculatePrev(ArrayList<Process> processes, int avail) {
+        ArrayList<Process> safeSeq = new ArrayList();
+        boolean flag = false;
+        Queue<Process> q = new LinkedList();
+        for(int i=0; i<processes.size(); i++){
+            q.add(processes.get(i));
+        }
+        
+        while(!q.isEmpty()){
+            Process tmp = q.remove();
+            if(tmp.time <= avail){
+                tmp.done=true;
+                avail += tmp.time;
+                safeSeq.add(tmp);
+            }
+            else{
+                q.add(tmp);
+            }
+            if(PrevDeadlock(processes, avail)){
+                flag = true;
+                break;
+            }
+        }
+        if(flag==false){
+            System.out.println("State: Safe");
+            System.out.println("Safe Sequence: ");
+            for(int i=0; i<safeSeq.size(); i++){
+                System.out.println(safeSeq.get(i).name);
+            }
+        }
+        else{
+            System.out.println("State: Deadlock");
+            if(safeSeq.size() > 0){
+                System.out.println("The processes that go in the safe sequence are only: ");
+                for(int i=0; i<safeSeq.size(); i++){
+                    System.out.println(safeSeq.get(i).name);
+                }
+            }
+            else{
+                System.out.println("No processes go in the safe sequence.");
+            }
+        }
+    }
+
+    private static boolean PrevDeadlock(ArrayList<Process> p, int avail) {
+        for(int i=0; i<p.size(); i++){
+            if(p.get(i).done == false && p.get(i).time <= avail)
+                return false;
+        }
+        return true;
+    }
 
    
-   
+}
+
+class Process{
+   int id;
+   String name;
+   int time;
+   boolean done;
+
+    Process(int i, String name, int time) {
+        id = i;
+        this.name = name;
+        this.time = time;
+        done = false;
+    }
 }

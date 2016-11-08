@@ -7,15 +7,11 @@ How to download project:
 Resolve the problem by adding "jama-1.0.2.jar" (included in the zipped folder) to the project's library
 
 How to run:
-1. Run MainClass.java
-2. Enter the letter of choice ("A" if Deadlock Prevention, "B" if Deadlock Avoidance)
-
 A. Deadlock Prevention
-
+1. 
 
 
 B. Deadlock Avoidance
-
 1. Enter number of processes and resources.
 2. The program will prompt the user for the details of the process. Enter such info.
 3. Enter available resources for each Resource.
